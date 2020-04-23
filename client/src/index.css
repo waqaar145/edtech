@@ -1,0 +1,133 @@
+.ckeditor-custom-height .ck-editor__editable {
+  min-height: 200px !important;
+}
+
+.ck-dropdown__arrow {
+  z-index: 0 !important;
+}
+
+.danger-react-select {
+  box-shadow: "0 0 0 1px red !important";
+  border-color: "red !important";
+}
+
+.react-select-danger-feedback {
+  color: red;
+  font-size: 12px;
+  margin-top: 0.25rem;
+}
+
+/* .css-1okebmr-indicatorSeparator {
+  background-color: red !important;
+} */
+/* .ckeditor-no-height .ck-editor__editable {
+  min-height: 200px !important;
+} */
+
+.create-form-heading-row {
+  background-color: white;
+  padding: 10px;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  border-left: 1px solid #c8ced3;
+  border-right: 1px solid #c8ced3;
+  border-top: 1px solid #c8ced3;
+}
+
+.create-form-heading h3 {
+  font-size: 21px;
+}
+
+.create-form-body-row {
+  background-color: white;
+  border-top: 1px solid #c8ced3;
+  border-right: 1px solid #c8ced3;
+  border-bottom: 1px solid #c8ced3;
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+  border-left: 1px solid #c8ced3;
+  border-right: 1px solid #c8ced3;
+  border-bottom: 1px solid #c8ced3;
+  padding-top: 30px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+}
+
+.create-form-body .col-form-label {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.small-label .col-form-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.lable-heading {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.lable-heading {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.create-form-body-row input[type="radio"], input[type="checkbox"] {
+  margin: 6px 0 10px;
+  margin-top: 10px;
+}
+
+.table-image-small {
+  width: 50px;
+}
+
+.spinner-align {
+  margin-left: auto;
+  margin-right: auto;
+  /* margin-top: 20px; */
+}
+
+.table-heading-row {
+  background-color: white;
+  border-top: 1px solid #c8ced3;
+  border-right: 1px solid #c8ced3;
+  border-bottom: 1px solid #c8ced3;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  border-left: 1px solid #c8ced3;
+  border-right: 1px solid #c8ced3;
+  border-bottom: 1px solid #c8ced3;
+  padding-top: 30px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+  display: flex;
+  flex-direction: row;
+}
+
+.table-heading-row .table-page-heading h3 {
+  font-size: 19px;
+}
+
+.table-heading-row .table-page-button {
+  margin-left: auto;
+}
+
+.table-body-row {
+  background-color: white;
+}
+
+.spinner-style {
+  padding: 20px;
+}
+
+.text-color-danger {
+  color: #f86c6b;
+  cursor: pointer;
+}
+
+.list-filter-style {
+  padding: 10px 20px 5px;
+  background-color: white;
+}
