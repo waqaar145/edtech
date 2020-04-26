@@ -15,7 +15,7 @@ const InputCheckbox = ({label, handleChange, error, value, disabled, ...restProp
         />
         {error && <div style={{color: '#f86c6b', fontSize: '80%', marginTop: '25px'}}>
           {error}
-      </div>}
+        </div>}
       </Col>
     </FormGroup>
   )

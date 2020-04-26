@@ -1,4 +1,4 @@
-import { GET_SUBJECTS, GET_SUBJECTS_BY_SLUG, DELETE_SUBJECT_BY_ID } from './../../types'
+import { GET_SUBJECTS, GET_SUBJECTS_BY_SLUG, DELETE_SUBJECT_BY_ID, CLEAR_SUBJECT_ACTION } from './../../types'
 import api from './../apis/subject';
 
 export function getSubjects(data){
@@ -19,6 +19,12 @@ export function deleteSubjectById (id) {
   return {
     type: DELETE_SUBJECT_BY_ID,
     data: id
+  }
+}
+
+export function clearSubjectAction () {
+  return {
+    type: CLEAR_SUBJECT_ACTION
   }
 }
 

@@ -50,9 +50,9 @@ const SubjectsList = (props) => {
           <Link to="/admin/subject/create"><Button color="primary">Create</Button></Link>
         </div>
       </div>
-      <div className="list-filter-style">
+      {/* <div className="list-filter-style">
         <SubjectFilter />
-      </div>
+      </div> */}
       <div className="table-body-row">
         <center className="spinner-align">
         {

@@ -16,6 +16,8 @@ export const GET_SUBJECTS_BY_SLUG = 'GET_SUBJECTS_BY_SLUG';
 
 export const DELETE_SUBJECT_BY_ID = 'DELETE_SUBJECT_BY_ID';
 
+export const CLEAR_SUBJECT_ACTION = 'CLEAR_SUBJECT_ACTION'
+
 // chapters
 export const GET_CHAPTERS = 'GET_CHAPTERS'
 

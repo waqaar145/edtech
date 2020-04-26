@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import { stringValidation, numberValidation, emailValidation, imageValidation, booleanValidation, validateFinallySimple } from './../validations/inputValidations';
+import { stringValidation, numberValidation, emailValidation, imageValidation, booleanValidation, objectValidation, validateFinallySimple } from './../validations/inputValidations';
 import { convertFileToBase64 } from './../validations/common';
 
 export default function useForm (INITIAL_STATE, submitCallback) {
@@ -40,7 +40,6 @@ export default function useForm (INITIAL_STATE, submitCallback) {
 
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
-    console.log(name, checked)
     setValues({
       ...values,
       [name]: {
@@ -51,12 +50,23 @@ export default function useForm (INITIAL_STATE, submitCallback) {
     }) 
   }
 
+  const handleReactSelectChange = (name, data) => {
+    setValues({
+      ...values,
+      [name]: {
+        ...values[name],
+        input_val: data
+      },
+      current_key: name
+    }) 
+  }
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setSubmitting(true)
-      // await validateFinallySimple(values);
+      await validateFinallySimple(values);
       submitCallback();
       setSubmitting(true);
     } catch(errors) {
@@ -72,11 +82,11 @@ export default function useForm (INITIAL_STATE, submitCallback) {
   useEffect(() => {
     async function validations () {
       if (values.current_key) {
-
         let name = values.current_key;
 
         let { type, condition, required, input_val } = values[name];
-        let min, max, size, dimensions, image_type;
+        let min, max, size, dimensions, image_type, pattern;
+
         if (type.name === 'String' || type.name === 'Number') {
           min = condition.min;
           max = condition.max;
@@ -84,6 +94,8 @@ export default function useForm (INITIAL_STATE, submitCallback) {
           size = condition.size;
           dimensions = condition.dimensions;
           image_type = condition.type;
+        } else if (type.name === 'Object') {
+          pattern = condition.pattern;
         }
 
         let error = {};
@@ -98,6 +110,8 @@ export default function useForm (INITIAL_STATE, submitCallback) {
           error = await imageValidation(name, input_val, required, size, dimensions, image_type);
         } else if (type.name === 'Boolean') {
           error = await booleanValidation(name, input_val, required);
+        } else if (type.name === 'Object') {
+          error = await objectValidation(name, input_val, required, pattern)
         }
 
         if (error) {
@@ -134,6 +148,7 @@ export default function useForm (INITIAL_STATE, submitCallback) {
     handleChange,
     handleFileChange,
     handleCheckboxChange,
+    handleReactSelectChange,
     handleSubmit,
     setSubmittingFn,
     submitting,

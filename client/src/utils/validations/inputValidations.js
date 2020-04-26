@@ -136,6 +136,30 @@ export const booleanValidation = (key, value, required) => {
 }
 
 
+export const objectValidation = (key, value, required, pattern) => {
+  console.log(key, value, required, pattern)
+  if (required || value) {
+    let error = false
+    for (let p of pattern) {
+      if (!(value.hasOwnProperty(p.key) && value[p.key])) {
+        error = true
+      }
+    }
+
+    if (error && required) {
+      return {
+        key: key,
+        msg: `${formateKeyName(key)} is required, ${pattern.map(key => key.key).join(', ')} shoule not be empty, PLEASE ASK THE CONCERNED ONE IF YOU ARE NOT SURE WHY IT'S HAPPENING`
+      } 
+    } else {
+      return '';
+    }
+
+  } else {
+    return '';
+  }
+}
+
 
 export const validateFinally = async (form) => {
   let errors = []
@@ -185,6 +209,8 @@ export const validateFinallySimple = async (values) => {
       error = await imageValidation(key1, value1.input_val, value1.required, value1.condition.min, value1.condition.max)
     } else if (value1.type.name === 'Boolean') {
       error = await booleanValidation(key1, value1.input_val, value1.required)
+    } else if (value1.type.name === 'Object') {
+      error = await objectValidation(key1, value1.input_val, value1.required, value1.condition.pattern)
     }
     if (error) errors.push(error);
   }

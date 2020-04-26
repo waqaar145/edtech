@@ -1,4 +1,4 @@
-import {GET_SUBJECTS, GET_SUBJECTS_BY_SLUG, DELETE_SUBJECT_BY_ID} from './../../types.js'
+import {GET_SUBJECTS, GET_SUBJECTS_BY_SLUG, DELETE_SUBJECT_BY_ID, CLEAR_SUBJECT_ACTION} from './../../types.js'
 let initialState = {
   subjects: [],
   subjects_label_value: [],
@@ -18,6 +18,9 @@ export default function User (state = initialState, action = {}){
 
     case DELETE_SUBJECT_BY_ID:
       return {...state, subjects: state.subjects.filter(subject => subject.id !== action.data)}
+
+    case CLEAR_SUBJECT_ACTION:
+      return {...state, subject: {}}
 
     default:
         return state;

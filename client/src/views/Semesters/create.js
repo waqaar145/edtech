@@ -131,7 +131,7 @@ const CreateSemester = (props) => {
         .then(response => {
           setSuccess(response.message)
           setSubmittingFn()
-          history.push('/admin/semester/edit/' + response.data.slug);
+          history.push('/admin/semesters');
         }).catch(error => {
           setServerErrors(error.response.data.data)
           setSubmittingFn()
