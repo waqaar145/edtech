@@ -38,6 +38,7 @@ export const createSemesterAction = (data) => async dispatch => {
 }
 
 export const getSemestersAction = () => async dispatch => {
+  console.log('---')
   try {
     let result = await api.semester.getList();
     return dispatch(getSemesters(result.data))

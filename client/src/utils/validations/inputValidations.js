@@ -137,7 +137,6 @@ export const booleanValidation = (key, value, required) => {
 
 
 export const objectValidation = (key, value, required, pattern) => {
-  console.log(key, value, required, pattern)
   if (required || value) {
     let error = false
     for (let p of pattern) {
@@ -196,7 +195,6 @@ export const validateFinally = async (form) => {
 export const validateFinallySimple = async (values) => {
   let errors = []
   for (const [key1, value1] of Object.entries(values)) {
-    console.log(key1, value1);
     if (key1 === 'current_key' || key1 === 'id') break;
     let error = {};
     if (value1.type.name === 'String') {

@@ -65,7 +65,7 @@ export default function useForm (INITIAL_STATE, submitCallback) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setSubmitting(true)
+      setSubmitting(true);
       await validateFinallySimple(values);
       submitCallback();
       setSubmitting(true);

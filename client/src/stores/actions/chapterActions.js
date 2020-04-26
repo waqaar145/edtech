@@ -1,4 +1,4 @@
-import { GET_CHAPTERS, GET_CHAPTER_BY_SLUG, DELETE_CHAPTER_BY_ID } from './../../types'
+import { GET_CHAPTERS, GET_CHAPTER_BY_SLUG, DELETE_CHAPTER_BY_ID, CLEAR_CHAPTER } from './../../types'
 import api from './../apis/chapter';
 
 export function getChapters(data){
@@ -19,6 +19,12 @@ export function deleteChapterById (id) {
   return {
     type: DELETE_CHAPTER_BY_ID,
     data: id
+  }
+}
+
+export function clearChapterAction () {
+  return {
+    type: CLEAR_CHAPTER
   }
 }
 

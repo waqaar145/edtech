@@ -75,7 +75,7 @@ const CreateSubject = (props) => {
   const { subject, onSetHeading, semesters_label_value, createSubjectAction, getSubjectBySlugAction, editSubjectAction, getSemestersAction, clearSubjectAction, history } = props;
   // ***** setting heading name AND EDIT
   let slug = props.match.params.subject_slug;
-  !slug ? onSetHeading('Create Semester') : onSetHeading('Edit Semester');
+  !slug ? onSetHeading('Create Subject') : onSetHeading('Edit Subject');
 
   useEffect(() => {
     getSemestersAction();

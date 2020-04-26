@@ -25,6 +25,8 @@ export const GET_CHAPTER_BY_SLUG = 'GET_CHAPTER_BY_SLUG'
 
 export const DELETE_CHAPTER_BY_ID = 'DELETE_CHAPTER_BY_ID'
 
+export const CLEAR_CHAPTER = 'CLEAR_CHAPTER'
+
 // content
 export const HANDLE_CE = 'HANDLE_CE'
 
