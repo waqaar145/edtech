@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import { stringValidation, numberValidation, emailValidation, imageValidation, booleanValidation, objectValidation, validateFinallySimple } from './../validations/inputValidations';
+import { stringValidation, stringHtmlValidation, numberValidation, arrayValidation, emailValidation, imageValidation, booleanValidation, objectValidation, validateFinallySimple } from './../validations/inputValidations';
 import { convertFileToBase64 } from './../validations/common';
 
 export default function useForm (INITIAL_STATE, submitCallback) {
@@ -61,6 +61,18 @@ export default function useForm (INITIAL_STATE, submitCallback) {
     }) 
   }
 
+  const handleCKEditorChange = (name, e, editor) => {
+    let data = editor.getData();
+    setValues({
+      ...values,
+      [name]: {
+        ...values[name],
+        input_val: data
+      },
+      current_key: name
+    }) 
+  }
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -87,7 +99,7 @@ export default function useForm (INITIAL_STATE, submitCallback) {
         let { type, condition, required, input_val } = values[name];
         let min, max, size, dimensions, image_type, pattern;
 
-        if (type.name === 'String' || type.name === 'Number') {
+        if (type.name === 'String' || type.name === 'Array' || type.name === 'htmlString' || type.name === 'Number') {
           min = condition.min;
           max = condition.max;
         } else if (type.name === 'File') {
@@ -102,8 +114,12 @@ export default function useForm (INITIAL_STATE, submitCallback) {
 
         if (type.name === 'String') {
           error = await stringValidation(name, input_val, required, min, max);
+        } else if (type.name === 'htmlString') {
+          error = await stringHtmlValidation(name, input_val, required, min, max);
         } else if (type.name === 'Number') {
           error = await numberValidation(name, input_val, required, min, max);
+        } else if (type.name === 'Array') {
+          error = await arrayValidation(name, input_val, required, min,max);
         } else if (type.name === 'Email') {
           error = await emailValidation(name, input_val, required)
         } else if (type.name === 'File') {
@@ -149,6 +165,7 @@ export default function useForm (INITIAL_STATE, submitCallback) {
     handleFileChange,
     handleCheckboxChange,
     handleReactSelectChange,
+    handleCKEditorChange,
     handleSubmit,
     setSubmittingFn,
     submitting,

@@ -35,6 +35,46 @@ export const stringValidation = async (key, value, required, min, max) => {
   }
 }
 
+export const stringHtmlValidation = (key, value, required, min, max) => {
+
+  if (required || value) {
+    if (!value) {
+      return {
+        key: key,
+        msg: `${formateKeyName(key)} is required`
+      }
+    }
+
+    var div = document.createElement("div");
+    div.innerHTML = value;
+    let text = div.innerText
+
+    if (required || text) {
+      if (typeof(text) === 'string') {
+        if (!(text.length >= min && text.length <= max)) {
+          return {
+            key: key,
+            msg: `${formateKeyName(key)} field should be ${min} and ${max} characters long`
+          }
+        }
+        return ''
+      } else {
+        return {
+          key: key,
+          msg: `${formateKeyName(key)} field should be characters`
+        }
+      }
+    } else {
+      return {
+        key: key,
+        msg: `${formateKeyName(key)} should be a characters`
+      }
+    }
+  } else {
+    return '';
+  }
+}
+
 export const numberValidation = async (key, value, required, min, max) => {
   let number = value ? Number(value) : '';
   if (number || required) {
@@ -67,6 +107,27 @@ export const numberValidation = async (key, value, required, min, max) => {
     }
   } else {
     return '';
+  }
+}
+
+export const arrayValidation = (key, value, required, min, max) => {
+  if (required || value) {
+    if (Array.isArray(value)) {
+      if (!(value.length >= min && value.length <= max)) {
+        return {
+          key: key,
+          msg: `${formateKeyName(key)} field should be between ${min} and ${max}`
+        }
+      }
+      return ''
+    } else {
+      return {
+        key: key,
+        msg: `${formateKeyName(key)} field should be a list`
+      }
+    }
+  } else {
+    return ''
   }
 }
 
@@ -199,8 +260,12 @@ export const validateFinallySimple = async (values) => {
     let error = {};
     if (value1.type.name === 'String') {
       error = await stringValidation(key1, value1.input_val, value1.required, value1.condition.min, value1.condition.max)
+    } else if (value1.type.name === 'htmlString') {
+      error = await stringHtmlValidation(key1, value1.input_val, value1.required, value1.condition.min, value1.condition.max)
     } else if (value1.type.name === 'Number') {
       error = await numberValidation(key1, value1.input_val, value1.required, value1.condition.min, value1.condition.max)
+    }  else if (value1.type.name === 'Array') {
+      error = await arrayValidation(key1, value1.input_val, value1.required, value1.condition.min, value1.condition.max);
     } else if (value1.type.name === 'Email') {
       error = await emailValidation(key1, value1.input_val, value1.required, value1.condition.min, value1.condition.max)
     } else if (value1.type.name === 'File') {

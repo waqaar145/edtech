@@ -8,8 +8,8 @@ import InputCheckbox from './../../partials/forms/InputCheckbox';
 import ReactSelect from './../../partials/forms/ReactSelect';
 import useForm from './../../utils/form/useForm';
 import {showInputFieldError} from './../../utils/validations/common';
-import ServerErrors from './../../components/messages/serverError'
-import ServerSuccess from './../../components/messages/serverSuccess'
+import ServerErrors from './../../components/messages/serverError';
+import ServerSuccess from './../../components/messages/serverSuccess';
 
 import {getSubjectBySemesterIdAction} from './../../stores/actions/subjectActions';
 import {createChapterAction, getChapterBySlugAction, editChapterAction, clearChapterAction} from './../../stores/actions/chapterActions';
@@ -243,14 +243,14 @@ const CreateChapter = (props) => {
           />
 
         <InputCheckbox
-            id="is_active"
-            type="checkbox"
-            name="is_active"
-            label="Is active"
-            value={values.is_active.input_val}
-            handleChange={handleCheckboxChange}
-            error={showInputFieldError(errors, 'is_active')}
-            />
+          id="is_active"
+          type="checkbox"
+          name="is_active"
+          label="Is active"
+          value={values.is_active.input_val}
+          handleChange={handleCheckboxChange}
+          error={showInputFieldError(errors, 'is_active')}
+          />
         <hr />
         <Button color="primary" type="submit" disabled={submitting ? true : false}>Save</Button>
       </Form>
