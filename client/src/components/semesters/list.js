@@ -3,51 +3,74 @@ import { Table } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
 import {Link} from 'react-router-dom';
+import MyClientTable from './../../partials/table/MyCientTable';
 
 const SemestersListRenderer = ({semesters, onDelete}) => {
 
+  const options = {
+    id: '#',
+    name: 'Semester name',
+    thumbnail: 'Thumbnail',
+    admin_name: 'Created by',
+    is_active: 'Active', 
+    view: 'View',
+    delete: 'Delete'
+  };
+
+  const columns = [
+    'id',
+    'name',
+    'thumbnail',
+    'admin_name',
+    'is_active',
+    'view',
+    'delete'
+  ];
+
+  const sortings = ['name'];
+  const filtering = ['name'];
+
+  const SemesterImage = ({data}) => {
+    return (
+      <img src={data.thumbnail} width="50" alt={data.name} />
+    )
+  }
+
+  const IsActive = ({data}) => {
+    return (
+      <span>{data.is_active ? 'Yes' : 'No'}</span>
+    )
+  }
+
+  const ViewWidget = ({data}) => {
+    return (
+      <Link to={`/admin/semester/edit/${data.slug}`}><FontAwesomeIcon icon={faEdit}/></Link>
+    )
+  }
+
+  const DeleteWidget = ({data}) => {
+    return (
+      <FontAwesomeIcon style={{color: 'red'}} onClick={() => onDelete(data.id)} icon={faTrash}/>
+    )
+  }
+
   return (
-    <Table hover>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Semester name</th>
-          <th>Thumbnail</th>
-          <th>Created by</th>
-          <th>Active</th>
-          <th>Edit</th>
-          <th>Delete</th>
-        </tr>
-      </thead>
-      <tbody>
-        {
-          semesters.map((semester, index) => {
-            return (
-              <tr key={semester.id}>
-                <th scope="row">{index + 1}</th>
-                <td>{semester.name}</td>
-                <td><img className="table-image-small" src={semester.thumbnail} /></td>
-                <td>{semester.admin_name}</td>
-                <td>{semester.is_active ? 'Yes' : 'No'}</td>
-                <td><Link to={`/admin/semester/edit/${semester.slug}`}><FontAwesomeIcon icon={faEdit}/></Link></td>
-                <td className="text-color-danger"><FontAwesomeIcon onClick={() => onDelete(semester.id)} icon={faTrash}/></td>
-              </tr>
-            )
-          })
-        }
-        {
-          semesters.length === 0 && <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>No data found</td>
-            <th></th>
-            <td></td>
-            <td></td>
-          </tr>
-        }
-      </tbody>
-    </Table>
+    <div>
+      <MyClientTable 
+        options={options} 
+        columns={columns} 
+        sortings={sortings}
+        filtering={filtering}
+        data={semesters}
+        total={semesters.length}
+        loading={false}
+        view={<ViewWidget/>}
+        delete={<DeleteWidget />}
+        is_active={<IsActive />}
+        thumbnail={<SemesterImage />}
+        >
+      </MyClientTable>
+    </div>
   )
 }
 
