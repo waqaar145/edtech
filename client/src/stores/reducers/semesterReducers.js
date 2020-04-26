@@ -1,4 +1,4 @@
-import {GET_SEMESTERS, GET_SEMESTERS_BY_SLUG, DELETE_SEMESTER_BY_ID} from './../../types.js'
+import {GET_SEMESTERS, GET_SEMESTERS_BY_SLUG, DELETE_SEMESTER_BY_ID, CLEAR_SEMESTER_ACTION} from './../../types.js'
 let initialState = {
   semesters: [],
   semesters_label_value: [],
@@ -18,6 +18,9 @@ export default function User (state = initialState, action = {}){
 
     case DELETE_SEMESTER_BY_ID:
       return {...state, semesters: state.semesters.filter(semester => semester.id !== action.data)}
+
+    case CLEAR_SEMESTER_ACTION:
+      return {...state, semester: {}}
 
     default:
         return state;

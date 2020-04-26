@@ -1,4 +1,4 @@
-import { GET_SEMESTERS, GET_SEMESTERS_BY_SLUG, DELETE_SEMESTER_BY_ID } from './../../types'
+import { GET_SEMESTERS, GET_SEMESTERS_BY_SLUG, DELETE_SEMESTER_BY_ID, CLEAR_SEMESTER_ACTION } from './../../types'
 import api from './../apis/semester';
 
 export function getSemesters(data){
@@ -19,6 +19,12 @@ export function deleteSemesterById (id) {
   return {
     type: DELETE_SEMESTER_BY_ID,
     data: id
+  }
+}
+
+export function clearSemester () {
+  return {
+    type: CLEAR_SEMESTER_ACTION
   }
 }
 
@@ -67,4 +73,8 @@ export const deleteSemesterAction = (id) => async dispatch => {
   } catch (error) {
     throw error
   }
+}
+
+export const clearSemesterAction = () => dispatch => {
+  dispatch(clearSemester())
 }

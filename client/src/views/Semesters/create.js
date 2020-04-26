@@ -1,203 +1,182 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Col, Container, Form, Input, Row, FormGroup, Label, FormFeedback } from 'reactstrap';
-import { validateFinally, stringValidation, booleanValidation } from './../../helpers/validation';
+import { Col, Form, Button } from 'reactstrap';
 import {connect} from 'react-redux';
-import {createSemesterAction, getSemesterBySlugAction, editSemesterAction} from './../../stores/actions/semesterActions';
-import './../../assets/css/error.css'
-import PropTypes from 'prop-types'
+
+import InputText from './../../partials/forms/InputText';
+import InputFile from './../../partials/forms/InputFile';
+import InputCheckbox from './../../partials/forms/InputCheckbox';
+import useForm from './../../utils/form/useForm';
+import {showInputFieldError} from './../../utils/validations/common';
 import ServerErrors from './../../components/messages/serverError'
 import ServerSuccess from './../../components/messages/serverSuccess'
+
+import {createSemesterAction, getSemesterBySlugAction, editSemesterAction, clearSemesterAction} from './../../stores/actions/semesterActions';
+import './../../assets/css/error.css'
+import PropTypes from 'prop-types'
 import CreateFormHOC from './../../HOCs/createForm'
 import { withRouter } from "react-router-dom";
 
 const CreateSemester = (props) => {
 
-  const { semester } = props;
-
-  let userState = {
-    semester_name: '',
-    thumbnail: '',
-    is_active: true
+  let INITIAL_STATE = {
+    semester_name: {
+      input_val: '',
+      required: true,
+      type: String,
+      condition: {
+        min: 5,
+        max: 30
+      }
+    },
+    thumbnail: {
+      input_val: '',
+      imgUrl: '',
+      required: true,
+      type: File,
+      condition: {
+        size: 2, // in mb
+        dimensions: {
+          height: 200,
+          width: 200
+        },
+        type: 'png|jpeg|jpg'
+      }
+    },
+    is_active: {
+      input_val: false,
+      required: true,
+      type: Boolean
+    },
+    id: null
   }
 
-  let userErrState = {
-    semester_name: '',
-    thumbnail: '',
-    is_active: ''
-  }
-
-  const [values, setValue] = useState(userState)
-  const [semester_id, setSemesterId] = useState(null);
-  const [thumbnail_url, setThumbnailUrl] = useState('');
-  const [errors, setErrors] = useState(userErrState)
-  const [serverErrors, setServerError] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState('')
-
+  const { semester, onSetHeading, createSemesterAction, getSemesterBySlugAction, editSemesterAction, clearSemesterAction, history } = props;
   // ***** setting heading name AND EDIT
   let slug = props.match.params.semester_slug;
+  !slug ? onSetHeading('Create Semester') : onSetHeading('Edit Semester');
+
   useEffect(() => {
-    let heading = '';
-    if (!slug) {
-      props.onSetHeading('Create Semester')
-    } else {
-      props.onSetHeading('Edit Semester')
-      // get Semester detail by semester slug
-      props.getSemesterBySlugAction(slug)
-        .then(
-          response => {
-            setValue(
-              {
-                ...values,
-                semester_name: response.data.semester_name,
-                thumbnail: response.data.thumbnail,
-                is_active: response.data.is_active
-              }
-            )
-            setSemesterId(response.data.semester_id)
-            setThumbnailUrl(response.data.thumbnail)
-          }
-        )
-        .catch(
-          error => {
-            console.log(error)
-          }
-        )
+    if (slug) {
+      getSemesterBySlugAction(slug);
+    }
+
+    return () => {
+      clearSemesterAction();
     }
   }, []);
-  // end setting heading name
 
-  const handleChange = (e) => {
-    let error;
-    const {name, value} = e.target;
+  const { 
+    values, 
+    handleChange, 
+    handleFileChange, 
+    handleCheckboxChange,
+    handleSubmit, 
+    setSubmittingFn,
+    submitting,
+    errors,
+    setToInitialState,
+    clearFilePlaceholder
+  } = useForm(INITIAL_STATE, submit);
 
-    switch (name) {
-      case 'semester_name':
-        error = stringValidation(value, name, 3, 35);
-        setErrors({...errors, [name]: error === true ? '' : error})
-        break;
-
-      default:
-
-    }
-    setValue({...values, [name]: value})
-  }
-
-  const handleChecked = (e) => {
-    let error;
-    const {name, checked} = e.target;
-
-    switch (name) {
-      case 'is_active':
-        error = booleanValidation(checked, name);
-        setErrors({...errors, [name]: error === true ? '' : error})
-        break;
-
-      default:
-
-    }
-    setValue({...values, [name]: checked})
-  }
-
-  const handleImage = (e) => {
-    let file = e.target.files[0];
-    if (!file) {
-      setErrors({...errors, thumbnail: 'Please select a file'})
-    }
-    setValue({...values, thumbnail: file})
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateFinally(errors, values) === true) {
-      setLoading(true)
-      let formData = new FormData();
-      let id = null;
-      if (slug) {
-        id = semester_id;
+  useEffect(() => {
+    if (Object.keys(semester).length > 0) {
+      let data = {
+        ...INITIAL_STATE,
+        semester_name: {
+          ...INITIAL_STATE.semester_name,
+          input_val: semester.semester_name
+        },
+        thumbnail: {
+          ...INITIAL_STATE.thumbnail,
+          required: slug ? false : true,
+          imgUrl: semester.thumbnail,
+        },
+        is_active: {
+          ...INITIAL_STATE.is_active,
+          input_val: semester.is_active
+        },
+        id: semester.semester_id,
       }
 
-      formData.append('semester_name', values.semester_name);
-      if (typeof values.thumbnail === 'object') {
-        formData.append('thumbnail', values.thumbnail)
-      }
-      formData.append('is_active', values.is_active)
-      if (!slug) {
-        props.createSemesterAction(formData)
-          .then(
-            response => {
-              setLoading(false);
-              setServerError([])
-              setValue({...values, semester_name: '', thumbnail: '', is_active: false})
-              setSuccess(response.message)
-              document.getElementById("thumbnail").value = ""; // reset the input field
-            }
-          ).catch(
-            error => {
-              setLoading(false);
-              if (error.response.status === 422) {
-                setServerError([...error.response.data.data])
-              }
-            }
-          )
-      } else {
-        props.editSemesterAction(formData, id)
-          .then(
-            response => {
-              setLoading(false);
-              setServerError([])
-              setSuccess(response.message)
-              setThumbnailUrl(response.data.thumbnail)
-              props.history.push('/admin/semester/edit/' + response.data.slug);
-            }
-          ).catch(
-            error => {
-              setLoading(false);
-              if (error.response.status === 422) {
-                setServerError([...error.response.data.data])
-              }
-            }
-          )
-      }
+      setToInitialState(data);
     }
+  }, [semester])
 
+  const [serverErrors, setServerErrors] = useState([]);
+  const [success, setSuccess] = useState('');
+
+  function submit () {
+
+    let formData = new FormData();
+    formData.append('semester_name', values.semester_name.input_val);
+    if (typeof values.thumbnail === 'object') {
+      formData.append('thumbnail', values.thumbnail.input_val)
+    }
+    formData.append('is_active', values.is_active.input_val)
+
+    if (!slug) {
+      createSemesterAction(formData)
+        .then(response => {
+          setSuccess(response.message)
+          setSubmittingFn()
+          setServerErrors([])
+          history.push('/admin/semesters');
+        }).catch(error => {
+          console.log(error)
+          setServerErrors(error.response.data.data)
+          setSubmittingFn()
+        });
+    } else {
+      editSemesterAction(formData, values.id)
+        .then(response => {
+          setSuccess(response.message)
+          setSubmittingFn()
+          history.push('/admin/semester/edit/' + response.data.slug);
+        }).catch(error => {
+          setServerErrors(error.response.data.data)
+          setSubmittingFn()
+        });
+    }
   }
 
   return (
     <Col xs={8} className="create-form-body">
       <Form onSubmit={handleSubmit}>
-        <FormGroup row>
-          <Label for="exampleEmail" sm={2}>Semester name</Label>
-          <Col sm={10}>
-            <Input type="text" name="semester_name" id="semester_name" placeholder="Semester name" value={values.semester_name} onChange={handleChange} invalid={errors.semester_name !== ''}/>
-            {errors.semester_name && <FormFeedback className="error">{errors.semester_name}</FormFeedback>}
-          </Col>
-        </FormGroup>
-        <FormGroup row>
-          <Label for="exampleEmail" sm={2}>Thumbnail</Label>
-          <Col sm={10}>
-            <Input type="file" name="thumbnail" id="thumbnail" placeholder="Thumbnail name" onChange={handleImage} invalid={errors.thumbnail !== ''}/>
-            {errors.thumbnail && <FormFeedback className="error">{errors.thumbnail}</FormFeedback>}
-          </Col>
-        </FormGroup>
-        {slug && <FormGroup row>
-          <Label for="exampleEmail" sm={2}></Label>
-          <Col sm={10}>
-            <img src={thumbnail_url} width="100"/>
-          </Col>
-        </FormGroup>}
-        <FormGroup row>
-          <Label for="exampleEmail" sm={2}>Active</Label>
-          <Col sm={10}>
-            <Input type="checkbox" name="is_active" checked={values.is_active} onChange={handleChecked}/>
-          </Col>
-        </FormGroup>
+        <InputText
+          id="semester_name"
+          type="text"
+          name="semester_name"
+          label="Semester name"
+          placeholder="Semester name"
+          value={values.semester_name.input_val}
+          handleChange={handleChange}
+          error={showInputFieldError(errors, 'semester_name')}
+          />
+
+        <InputFile // don't use id here as used in semester name
+          type="file"
+          name="thumbnail"
+          label="Thumbnail"
+          handleChange={handleFileChange}
+          error={showInputFieldError(errors, 'thumbnail')}
+          selectedimage={values.thumbnail.imgUrl}
+          />
+
+        <InputCheckbox
+          id="is_active"
+          type="checkbox"
+          name="is_active"
+          label="Is active"
+          value={values.is_active.input_val}
+          handleChange={handleCheckboxChange}
+          error={showInputFieldError(errors, 'is_active')}
+          />
         <hr />
-        <Button color="primary" type="submit" disabled={loading ? true : false}>Save</Button>
+        <Button color="primary" type="submit" disabled={submitting ? true : false}>Save</Button>
       </Form>
       <br />
       {
-        serverErrors.length > 0 && <ServerErrors errors={serverErrors} />
+        (Array.isArray(serverErrors) && serverErrors.length > 0) && <ServerErrors errors={serverErrors} />
       }
       {
         success && <ServerSuccess message={success} />
@@ -209,10 +188,11 @@ const CreateSemester = (props) => {
 CreateSemester.propTypes = {
   createSemesterAction: PropTypes.func,
   getSemesterBySlugAction: PropTypes.func,
-  editSemesterAction: PropTypes.func
+  editSemesterAction: PropTypes.func,
+  clearSemesterAction: PropTypes.func
 }
 
-const mapDispatchToProps = { createSemesterAction, getSemesterBySlugAction, editSemesterAction };
+const mapDispatchToProps = { createSemesterAction, getSemesterBySlugAction, editSemesterAction, clearSemesterAction };
 
 function mapStateToProps (state) {
   return {
