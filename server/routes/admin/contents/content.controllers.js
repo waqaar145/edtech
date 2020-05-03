@@ -234,7 +234,7 @@ module.exports.getContentBySlug = async (req, res) => {
           label: chapter.chapter_name
         },
 
-        is_active: chapter.cp_is_active,
+        is_active: content.cn_is_active,
       }
 
       return res.status(200).send({

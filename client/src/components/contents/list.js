@@ -3,65 +3,88 @@ import { Table } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
 import {Link} from 'react-router-dom';
+import MyClientTable from './../../partials/table/MyCientTable';
 
 const ContentListRenderer = ({contents, onDelete}) => {
 
-  function createMarkup(data) {
+  const options = {
+    id: '#',
+    content_name: 'Content name',
+    semester_name: 'Semester name',
+    subject_name: 'Subject name',
+    chapter_name: 'Chapter name',
+    content_type: 'Content type',
+    difficulty_level: 'Difficulty level',
+    admin_name: 'Written by',
+    is_active: 'Active', 
+    view: 'View',
+    delete: 'Delete'
+  };
+
+  const columns = [
+    'id',
+    'content_name',
+    'semester_name',
+    'subject_name',
+    'chapter_name',
+    'content_type',
+    'difficulty_level',
+    'admin_name',
+    'is_active',
+    'view',
+    'delete'
+  ];
+
+  const sortings = ['name', 'chapter_name', 'semester_name', 'subject_name'];
+  const filtering = ['name', 'chapter_name', 'semester_name', 'subject_name'];
+
+  const createMarkup = (data) => {
     return {
        __html: data
     };
  };
 
+  const ContentNameWidget = ({data}) => {
+    return (
+      <span dangerouslySetInnerHTML={createMarkup(data.name)}></span>
+    )
+  }
+
+  const IsActive = ({data}) => {
+    return (
+      <span>{data.is_active ? 'Yes' : 'No'}</span>
+    )
+  }
+
+  const ViewWidget = ({data}) => {
+    return (
+      <Link to={`/admin/content/edit/${data.slug}`}><FontAwesomeIcon icon={faEdit}/></Link>
+    )
+  }
+
+  const DeleteWidget = ({data}) => {
+    return (
+      <FontAwesomeIcon style={{color: 'red'}} onClick={() => onDelete(data.id)} icon={faTrash}/>
+    )
+  }
+
   return (
-    <Table hover>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Content name</th>
-          <th>Semester</th>
-          <th>Subject</th>
-          <th>Chapter</th>
-          <th>Content type</th>
-          <th>Difficulty level</th>
-          <th>Created by</th>
-          <th>Active</th>
-          <th>Edit</th>
-          <th>Delete</th>
-        </tr>
-      </thead>
-      <tbody>
-        {
-          contents.map((content, index) => {
-            return (
-              <tr key={content.id}>
-                <th scope="row">{index + 1}</th>
-                <td dangerouslySetInnerHTML={createMarkup(content.name)}></td>
-                <td>{content.semester_name}</td>
-                <td>{content.subject_name}</td>
-                <td>{content.chapter_name}</td>
-                <td>{content.content_type}</td>
-                <td>{content.difficulty_level}</td>
-                <td>{content.admin_name}</td>
-                <td>{content.is_active ? 'Yes' : 'No'}</td>
-                <td><Link to={`/admin/content/edit/${content.slug}`}><FontAwesomeIcon icon={faEdit}/></Link></td>
-                <td className="text-color-danger"><FontAwesomeIcon onClick={() => onDelete(content.id)} icon={faTrash}/></td>
-              </tr>
-            )
-          })
-        }
-        {
-          contents.length === 0 && <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>No data found</td>
-            <th></th>
-            <td></td>
-            <td></td>
-          </tr>
-        }
-      </tbody>
-    </Table>
+    <div>
+      <MyClientTable 
+        options={options} 
+        columns={columns} 
+        sortings={sortings}
+        filtering={filtering}
+        data={contents}
+        total={contents.length}
+        loading={false}
+        content_name={<ContentNameWidget />}
+        view={<ViewWidget/>}
+        delete={<DeleteWidget />}
+        is_active={<IsActive />}
+        >
+      </MyClientTable>
+    </div>
   )
 }
 

@@ -166,7 +166,9 @@ const CreateChapter = (props) => {
 
       setToInitialState(data);
     }
-  }, [chapter])
+  }, [chapter]);
+
+  console.log(values)
 
   function submit () {
     let data = {

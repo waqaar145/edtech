@@ -4,7 +4,7 @@ import {FormGroup, Label, Col } from 'reactstrap';
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
-const InputCKEditor = ({label, handleChange, error, value, ckeditorHeightClass}) => {
+const InputCKEditor = ({id, label, handleChange, error, value, ckeditorHeightClass}) => {
 
   return (
     <FormGroup row>
@@ -13,10 +13,15 @@ const InputCKEditor = ({label, handleChange, error, value, ckeditorHeightClass})
       </Label>
       <Col sm={10} className={ckeditorHeightClass}>
         <CKEditor
+          id={id}
           editor={ ClassicEditor }
           data={value}
-          onInit={ editor => {} }
-          onChange={handleChange}
+          onInit={editor => {
+            editor.setData(value)
+          }}
+          onChange={(event, editor) => {
+            handleChange(editor)
+          }}
         />
         {error && <div style={{color: '#f86c6b', fontSize: '80%'}}>
           {error}

@@ -8,6 +8,8 @@ export default function useForm (INITIAL_STATE, submitCallback) {
   const [errors, setErrors] = useState([]);
   // eslint-disable-next-line no-unused-vars
   const [submitting, setSubmitting] = useState(false);
+  // set CKEDitor count
+  const [ckEditorCount, setCKEditorCount] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,7 +63,7 @@ export default function useForm (INITIAL_STATE, submitCallback) {
     }) 
   }
 
-  const handleCKEditorChange = (name, e, editor) => {
+  const handleCKEditorChange = (name, editor) => {
     let data = editor.getData();
     setValues({
       ...values,
@@ -70,7 +72,7 @@ export default function useForm (INITIAL_STATE, submitCallback) {
         input_val: data
       },
       current_key: name
-    }) 
+    });
   }
 
 
@@ -154,6 +156,9 @@ export default function useForm (INITIAL_STATE, submitCallback) {
   }
 
   const clearFilePlaceholder = (ids) => {
+    if (!Array.isArray(ids)) {
+      return;
+    }
     for (let id of ids) {
       document.getElementById(id).value = "";
     }
@@ -161,6 +166,7 @@ export default function useForm (INITIAL_STATE, submitCallback) {
 
   return {
     values,
+    ckEditorCount,
     handleChange,
     handleFileChange,
     handleCheckboxChange,

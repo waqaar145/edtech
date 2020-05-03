@@ -26,6 +26,7 @@
     "react-app-polyfill": "^1.0.1",
     "react-bootstrap": "^1.0.1",
     "react-chartjs-2": "^2.7.6",
+    "react-data-table-component": "^6.9.1",
     "react-dom": "^16.8.6",
     "react-redux": "^7.2.0",
     "react-router-config": "^5.0.1",

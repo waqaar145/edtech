@@ -28,13 +28,11 @@ export const DELETE_CHAPTER_BY_ID = 'DELETE_CHAPTER_BY_ID'
 export const CLEAR_CHAPTER = 'CLEAR_CHAPTER'
 
 // content
-export const HANDLE_CE = 'HANDLE_CE'
+export const INPUT_STRING_ACTION = 'INPUT_STRING_ACTION'
 
-export const HANDLE_CS = 'HANDLE_CS'
+export const SET_CLIENT_ERRORS = 'SET_CLIENT_ERRORS'
 
-export const HANDLE_DC = 'HANDLE_DC'
-
-export const HANDLE_CB = 'HANDLE_CB'
+export const SET_CLIENT_SUBMIT_ERRORS = 'SET_CLIENT_SUBMIT_ERRORS'
 
 export const CONTENT_FORM_ERROR = 'CONTENT_FORM_ERROR'
 
@@ -49,6 +47,8 @@ export const GET_CONTENTS = 'GET_CONTENTS'
 export const GET_CONTENT_BY_SLUG = 'GET_CONTENT_BY_SLUG'
 
 export const DELETE_CONTENT_BY_ID = 'DELETE_CONTENT_BY_ID'
+
+export const CLEAR_CONTENT = 'CLEAR_CONTENT'
 
 // bloogs
 // 1) categories

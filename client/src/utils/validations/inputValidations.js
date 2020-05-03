@@ -36,7 +36,6 @@ export const stringValidation = async (key, value, required, min, max) => {
 }
 
 export const stringHtmlValidation = (key, value, required, min, max) => {
-
   if (required || value) {
     if (!value) {
       return {
@@ -49,25 +48,18 @@ export const stringHtmlValidation = (key, value, required, min, max) => {
     div.innerHTML = value;
     let text = div.innerText
 
-    if (required || text) {
-      if (typeof(text) === 'string') {
-        if (!(text.length >= min && text.length <= max)) {
-          return {
-            key: key,
-            msg: `${formateKeyName(key)} field should be ${min} and ${max} characters long`
-          }
-        }
-        return ''
-      } else {
+    if (typeof(text) === 'string') {
+      if (!(text.length >= min && text.length <= max)) {
         return {
           key: key,
-          msg: `${formateKeyName(key)} field should be characters`
+          msg: `${formateKeyName(key)} field should be ${min} and ${max} characters long`
         }
       }
+      return ''
     } else {
       return {
         key: key,
-        msg: `${formateKeyName(key)} should be a characters`
+        msg: `${formateKeyName(key)} field should be characters`
       }
     }
   } else {
@@ -256,7 +248,7 @@ export const validateFinally = async (form) => {
 export const validateFinallySimple = async (values) => {
   let errors = []
   for (const [key1, value1] of Object.entries(values)) {
-    if (key1 === 'current_key' || key1 === 'id') break;
+    if (key1 === 'client_errors' || key1 === 'id') break;
     let error = {};
     if (value1.type.name === 'String') {
       error = await stringValidation(key1, value1.input_val, value1.required, value1.condition.min, value1.condition.max)
