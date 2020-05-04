@@ -40,6 +40,12 @@ const SubjectsList = (props) => {
     }
   }
 
+  if (!Array.isArray(subjects)) {
+    return (
+      <div></div>
+    )
+  }
+
   return (
     <div>
       <div className="table-heading-row">

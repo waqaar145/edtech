@@ -40,6 +40,12 @@ const ContentsList = (props) => {
     }
   }
 
+  if (!Array.isArray(contents)) {
+    return (
+      <div></div>
+    )
+  }
+
   return (
     <div>
       <div className="table-heading-row">

@@ -1,4 +1,4 @@
-import {GET_BLOG_CATEGORIES, GET_SEMESTERS_BY_SLUG, DELETE_BLOG_CATEGORY_BY_ID} from './../../types.js'
+import {GET_BLOG_CATEGORIES, GET_SEMESTERS_BY_SLUG, DELETE_BLOG_CATEGORY_BY_ID, GET_BLOG_CATEGORY_BY_SLUG} from './../../types.js'
 let initialState = {
   categories: [],
   categories_label_value: [],
@@ -18,6 +18,9 @@ export default function Blog (state = initialState, action = {}){
 
     case DELETE_BLOG_CATEGORY_BY_ID:
       return {...state, categories: state.categories.filter(category => category.id !== action.data)}
+
+    case GET_BLOG_CATEGORY_BY_SLUG:
+      return {...state, category : { ...action.data }}
 
     default:
         return state;

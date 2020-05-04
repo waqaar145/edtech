@@ -39,6 +39,12 @@ const SemestersList = (props) => {
     }
   }
 
+  if (!Array.isArray(categories)) {
+    return (
+      <div></div>
+    )
+  }
+
   return (
     <div>
       <div className="table-heading-row">

@@ -40,6 +40,12 @@ const ChaptersList = (props) => {
     }
   }
 
+  if (!Array.isArray(chapters)) {
+    return (
+      <div></div>
+    )
+  }
+
   return (
     <div>
       <div className="table-heading-row">
