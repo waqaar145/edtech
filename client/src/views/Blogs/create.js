@@ -17,7 +17,7 @@ import './../../assets/css/error.css'
 import PropTypes from 'prop-types'
 import CreateFormHOC from './../../HOCs/createForm'
 import { withRouter } from "react-router-dom";
-import {getBlogCategoriesAction, clearBlogAction, InputStringAction, InputErrorAction} from './../../stores/actions/blogActions';
+import {getBlogCategoriesAction, clearBlogAction, InputStringAction, InputErrorAction, createBlogAction, getBlogBySlugAction, editBlogAction} from './../../stores/actions/blogActions';
 
 const CreateBlog = (props) => {
 
@@ -30,7 +30,9 @@ const CreateBlog = (props) => {
     categories, // list of tags
     onSetHeading, 
     getBlogCategoriesAction,
-    // getBlogBySlugAction,
+    createBlogAction,
+    editBlogAction,
+    getBlogBySlugAction,
     clearBlogAction,
     history } = props;
 
@@ -45,7 +47,7 @@ const CreateBlog = (props) => {
     getBlogCategoriesAction();
 
     if (slug) {
-      // getBlogBySlugAction(slug);
+      getBlogBySlugAction(slug);
     }
 
     return () => {
@@ -104,23 +106,23 @@ const CreateBlog = (props) => {
   }
 
   const handleSubmit = async (e) => {
-    // e.preventDefault();
-    // if (!slug) {
-    //   createContentAction(form)
-    //     .then(response => {
-    //       setSuccess(response.message)
-    //       setServerErrors([])
-    //       history.push('/admin/contents');
-    //     }).catch(error => {
-    //     });
-    // } else {
-    //   editContentAction(form, form.id)
-    //     .then(response => {
-    //       setSuccess(response.message)
-    //       history.push('/admin/contents');
-    //     }).catch(error => {
-    //     });
-    // }
+    e.preventDefault();
+    if (!slug) {
+      createBlogAction(form)
+        .then(response => {
+          setSuccess(response.message)
+          setServerErrors([])
+          history.push('/admin/blogs');
+        }).catch(error => {
+        });
+    } else {
+      editBlogAction(form, form.id)
+        .then(response => {
+          setSuccess(response.message)
+          history.push('/admin/blogs');
+        }).catch(error => {
+        });
+    }
   }
 
 
@@ -157,8 +159,15 @@ const CreateBlog = (props) => {
           error={showInputFieldError(errors, 'description')}
           ckeditorHeightClass="ckeditor-custom-height"
           />
-          
+          <hr />
+          <Button color="primary" type="submit">Save</Button>
       </Form>
+      {
+        form.server_errors.length > 0 && <ServerErrors errors={form.server_errors} />
+      }
+      {
+        success && <ServerSuccess message={success} />
+      }
     </Col>
   )
 }
@@ -167,7 +176,11 @@ const mapDispatchToProps = {
   getBlogCategoriesAction,
   clearBlogAction,
   InputStringAction,
-  InputErrorAction 
+  InputErrorAction,
+
+  createBlogAction,
+  getBlogBySlugAction,
+  editBlogAction
 };
 
 function mapStateToProps (state) {

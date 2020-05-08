@@ -1,4 +1,4 @@
-import { GET_BLOG_CATEGORIES, GET_BLOG_CATEGORY_BY_SLUG, DELETE_BLOG_CATEGORY_BY_ID, CLEAR_BLOG_ACTION, INPUT_BLOG_STRING_ACTION, SET_BLOG_CLIENT_ERRORS, SET_BLOG_CLIENT_SUBMIT_ERRORS } from './../../types'
+import { GET_BLOG_CATEGORIES, GET_BLOG_CATEGORY_BY_SLUG, DELETE_BLOG_CATEGORY_BY_ID, CLEAR_BLOG_ACTION, INPUT_BLOG_STRING_ACTION, SET_BLOG_CLIENT_ERRORS, SET_BLOG_CLIENT_SUBMIT_ERRORS, GET_BLOGS, GET_BLOG_BY_SLUG, DELETE_BLOG_BY_ID } from './../../types'
 import api from './../apis/blog';
 import {stringHtmlValidation, stringValidation, numberValidation, arrayValidation, booleanValidation, objectValidation, validateFinallySimple} from './../../utils/validations/inputValidations'
 
@@ -47,6 +47,27 @@ export function InputError (data) {
 export function setClientError (data) {
   return {
     type: SET_BLOG_CLIENT_SUBMIT_ERRORS,
+    data
+  }
+}
+
+export function getBlogs (data) {
+  return {
+    type: GET_BLOGS,
+    data
+  }
+}
+
+export function deleteBlogById (data) {
+  return {
+    type: DELETE_BLOG_BY_ID,
+    data
+  }
+}
+
+export function getBlogBySlug (data) {
+  return {
+    type: GET_BLOG_BY_SLUG,
     data
   }
 }
@@ -131,31 +152,36 @@ export const deleteBlogCategoryAction = (id) => async dispatch => {
   }
 }
 
-// CREATE BLOG
+// BLOG
+export const getBlogsAction = () => async dispatch => {
+  try {
+    let result = await api.blog.getList();
+    return dispatch(getBlogs(result.data))
+  } catch (error) {
+    throw error;
+  }
+}
+
+
 export const createBlogAction = (data) => async dispatch => {
   try {
     await validateFinallySimple(data);
-    let years_asked_data = [];
+    let tags = [];
 
-    for (let y of data.years_asked.input_val) {
-      years_asked_data.push(y.value)
+    for (let y of data.tags.input_val) {
+      tags.push(y.value)
     }
     let final_object = {
-      content_name: data.content_name.input_val,
-      content_slug: data.content_slug.input_val,
-      content_description: data.content_description.input_val,
-      semester_id: data.semester.input_val.value,
-      subject_id: data.subject.input_val.value,
-      chapter_id: data.chapter.input_val.value,
-      content_type: data.content_type.input_val.value,
-      difficulty_level: data.difficulty_level.input_val.value,
-      years_asked: years_asked_data,
+      title: data.title.input_val,
+      tags: tags,
+      description: data.description.input_val,
       is_active: data.is_active.input_val,
     }
 
-    let result = await api.content.create(final_object);
+    let result = await api.blog.create(final_object);
     return result
   } catch (error) {
+    console.log(error);
     if (error.hasOwnProperty('error_type')) {
       dispatch(setClientError(error))
     } else {
@@ -171,25 +197,19 @@ export const createBlogAction = (data) => async dispatch => {
 export const editBlogAction = (data, id) => async dispatch => {
   try {
     await validateFinallySimple(data);
-    let years_asked_data = [];
+    let tags = [];
 
-    for (let y of data.years_asked.input_val) {
-      years_asked_data.push(y.value)
+    for (let y of data.tags.input_val) {
+      tags.push(y.value)
     }
     let final_object = {
-      content_name: data.content_name.input_val,
-      content_slug: data.content_slug.input_val,
-      content_description: data.content_description.input_val,
-      semester_id: data.semester.input_val.value,
-      subject_id: data.subject.input_val.value,
-      chapter_id: data.chapter.input_val.value,
-      content_type: data.content_type.input_val.value,
-      difficulty_level: data.difficulty_level.input_val.value,
-      years_asked: years_asked_data,
+      title: data.title.input_val,
+      tags: tags,
+      description: data.description.input_val,
       is_active: data.is_active.input_val,
     }
 
-    let result = await api.content.edit(final_object, id);
+    let result = await api.blog.edit(final_object, id);
     return result;
   } catch (error) {
     if (error.hasOwnProperty('error_type')) {
@@ -201,5 +221,25 @@ export const editBlogAction = (data, id) => async dispatch => {
       }
       dispatch(setClientError(obj))
     }
+  }
+}
+
+
+export const getBlogBySlugAction = (slug) => async dispatch => {
+  try {
+    let result = await api.blog.getBySlug(slug);
+    return dispatch(getBlogBySlug(result.data));
+  } catch (error) {
+    throw error
+  }
+}
+
+export const deleteBlogAction = (id) => async dispatch => {
+  try {
+    let result = await api.blog.delete(id);
+    dispatch(deleteBlogById(id));
+    return result;
+  } catch (error) {
+    throw error
   }
 }

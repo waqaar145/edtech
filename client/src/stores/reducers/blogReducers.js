@@ -1,4 +1,4 @@
-import {GET_BLOG_CATEGORIES, GET_SEMESTERS_BY_SLUG, DELETE_BLOG_CATEGORY_BY_ID, GET_BLOG_CATEGORY_BY_SLUG, INPUT_BLOG_STRING_ACTION, SET_BLOG_CLIENT_ERRORS, SET_BLOG_CLIENT_SUBMIT_ERRORS} from './../../types.js'
+import {GET_BLOG_CATEGORIES, GET_SEMESTERS_BY_SLUG, DELETE_BLOG_CATEGORY_BY_ID, GET_BLOG_CATEGORY_BY_SLUG, INPUT_BLOG_STRING_ACTION, SET_BLOG_CLIENT_ERRORS, SET_BLOG_CLIENT_SUBMIT_ERRORS, GET_BLOGS, GET_BLOG_BY_SLUG, DELETE_BLOG_BY_ID} from './../../types.js'
 
   // Start - Initial state
   let form = {
@@ -46,6 +46,7 @@ import {GET_BLOG_CATEGORIES, GET_SEMESTERS_BY_SLUG, DELETE_BLOG_CATEGORY_BY_ID, 
     categories: [],
     categories_label_value: [],
     category: {},
+    blogs: [],
     blog: {}
   }
 export default function Blog (state = initialState, action = {}){
@@ -133,6 +134,38 @@ export default function Blog (state = initialState, action = {}){
 
     case GET_BLOG_CATEGORY_BY_SLUG:
       return {...state, category : { ...action.data }}
+
+    // blogs
+    case GET_BLOGS:
+      return { ...state, blogs: action.data }
+
+    case DELETE_BLOG_BY_ID:
+      return {...state, blogs: state.blogs.filter(blog => blog.id !== action.data)}
+
+    case GET_BLOG_BY_SLUG:
+      return {
+        ...state,
+        form: {
+          ...state.form,
+          title: {
+            ...state.form.title,
+            input_val: action.data.title
+          },
+          description: {
+            ...state.form.description,
+            input_val: action.data.description
+          },
+          tags: {
+            ...state.form.tags,
+            input_val: action.data.tags
+          },
+          is_active: {
+            ...state.form.is_active,
+            input_val: action.data.is_active
+          },
+          id: action.data.id
+        }
+      }
 
     default:
         return state;
