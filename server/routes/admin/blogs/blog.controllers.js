@@ -180,7 +180,7 @@ module.exports.editBlog = async (req, res) => {
       })
     }
 
-    let tags_delete = await trx('ed_blogs_categories').where('b_c_id', blog_id).del().returning('*');
+    let tags_delete = await trx('ed_blogs_categories').where('b_c_blog_id', blog_id).del().returning('*');
     let tags_result = await trx('ed_blogs_categories').insert(tags_arr).returning('*');
 
     trx.commit();
