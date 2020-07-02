@@ -4,6 +4,8 @@ exports.up = function(knex, Promise) {
     table.string('b_title', 5000).notNullable();
     table.string('b_slug', 1000).unique().notNullable();
     table.string('b_description', 20000);
+    table.string('b_content', 20000);
+    table.string('b_thumbnail', 2000);
     table.integer('b_admin_id').references('a_id').inTable('ed_admins');
     table.boolean('b_is_active').defaultTo(true);
     table.boolean('b_is_deleted').defaultTo(false);

@@ -132,6 +132,7 @@ export const InputErrorAction = object => async dispatch => {
 
 export const createContentAction = (data) => async dispatch => {
   try {
+    console.log(data)
     await validateFinallySimple(data);
     let years_asked_data = [];
 

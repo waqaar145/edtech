@@ -1,5 +1,5 @@
-import {GET_BLOG_CATEGORIES, GET_SEMESTERS_BY_SLUG, DELETE_BLOG_CATEGORY_BY_ID, GET_BLOG_CATEGORY_BY_SLUG, INPUT_BLOG_STRING_ACTION, SET_BLOG_CLIENT_ERRORS, SET_BLOG_CLIENT_SUBMIT_ERRORS, GET_BLOGS, GET_BLOG_BY_SLUG, DELETE_BLOG_BY_ID} from './../../types.js'
-
+import {GET_BLOG_CATEGORIES, GET_SEMESTERS_BY_SLUG, DELETE_BLOG_CATEGORY_BY_ID, GET_BLOG_CATEGORY_BY_SLUG, INPUT_BLOG_STRING_ACTION, INPUT_BLOG_THUMBNAIL, SET_BLOG_CLIENT_ERRORS, SET_BLOG_CLIENT_SUBMIT_ERRORS, GET_BLOGS, GET_BLOG_BY_SLUG, DELETE_BLOG_BY_ID} from './../../types.js'
+import ReactHtmlParser from 'react-html-parser';
   // Start - Initial state
   let form = {
     title: {
@@ -8,17 +8,36 @@ import {GET_BLOG_CATEGORIES, GET_SEMESTERS_BY_SLUG, DELETE_BLOG_CATEGORY_BY_ID, 
       type: String,
       condition: {
         min: 5,
-        max: 300
+        max: 200
       }
     },
     description: {
       input_val: '',
       required: true,
+      type: String,
+      condition: {
+        min: 5,
+        max: 500
+      }
+    },
+    thumbnail: {
+      input_val: {},
+      imgUrl: '',
+      required: true,
+      type: File,
+      condition: {
+        min: 1,
+        max: 5
+      }
+    },
+    content: {
+      input_val: '',
+      required: false,
       type: {
         name: 'htmlString'
       },
       condition: {
-        min: 50,
+        min: 5,
         max: 20000
       }
     },
@@ -57,7 +76,6 @@ export default function Blog (state = initialState, action = {}){
 
       const { target} = action.data;
       const { name, value} = target;
-
       return {
         ...state,
         form: {
@@ -65,6 +83,22 @@ export default function Blog (state = initialState, action = {}){
           [name]: {
             ...state.form[name],
             input_val: value
+          }
+        }
+      };
+
+    case INPUT_BLOG_THUMBNAIL:
+
+      const target1 = action.data;
+      console.log(target1)
+      return {
+        ...state,
+        form: {
+          ...state.form,
+          [target1.target.name]: {
+            ...state.form[target1.target.name],
+            input_val: target1.target.value,
+            imgUrl: target1.initialState.imgUrl
           }
         }
       };
@@ -162,6 +196,15 @@ export default function Blog (state = initialState, action = {}){
           is_active: {
             ...state.form.is_active,
             input_val: action.data.is_active
+          },
+          content: {
+            ...state.form.content,
+            input_val: action.data.content
+          },
+          thumbnail: {
+            ...state.form.thumbnail,
+            imgUrl: action.data.thumbnail,
+            required: false
           },
           id: action.data.id
         }

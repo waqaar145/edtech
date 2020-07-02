@@ -22,6 +22,15 @@ import { GET_CONTENT_YEARS, GET_CONTENTS, GET_CONTENT_BY_SLUG, DELETE_CONTENT_BY
         max: 300
       }
     },
+    content_number: {
+      input_val: '',
+      required: true,
+      type: Number,
+      condition: {
+        min: 1,
+        max: 100
+      }
+    },
     content_description: {
       input_val: '',
       required: true,

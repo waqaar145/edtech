@@ -2,7 +2,9 @@ const knex = require('./../../../db/knex');
 const { check, validationResult } = require('express-validator');
 const {unExpectedError} = require('./../../../messages/error');
 const config = require('./../../../config/config')
-const { convertIntoSlug } = require('./../../../helpers/slug')
+const { convertIntoSlug } = require('./../../../helpers/slug');
+const { fileUpload } = require('./../../../helpers/multiple_file_upload');
+const fileUploadNow = fileUpload.single('thumbnail');
 
 module.exports.getBlogs = async (req, res) => {
   try {
@@ -35,36 +37,71 @@ module.exports.getBlogs = async (req, res) => {
 }
 
 module.exports.createBlog = async (req, res) => {
-
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).send({
-      message: 'Got error while submitting',
-      data: errors.array()
-    });
-  }
-
-  let trx = await knex.transaction();
-  try {
-    let loggedin_user = req.user.uid;
-    const {title, tags, description, is_active} = req.body;
-
-    let slug = convertIntoSlug(title);
-
-    let obj = {
-      b_title: title,
-      b_slug: slug,
-      b_description: description,
-      b_admin_id: loggedin_user,
-      b_is_active: is_active
+  fileUploadNow(req, res, async function (err) {
+    if (err) {
+      return res.status(422).send(unExpectedError(
+        'Please select a thumbnail & only .png, .jpg and .jpeg format allowed!',
+        'Please select a thumbnail & only .png, .jpg and .jpeg format allowed!',
+        'image'
+      ))
     }
+    if (!req.file) { // if there is no file or error in file
+      return res.status(422).send(unExpectedError(
+        'Please select a thumbnail & only .png, .jpg and .jpeg format allowed!',
+        'Please select a thumbnail & only .png, .jpg and .jpeg format allowed!',
+        'image'
+      ))
+    }
+    let trx = await knex.transaction();
+    try {
+      await check('title').isLength({ min: 5, max: 200}).withMessage('Title is required & characters length should be between 5 and 200.').trim().escape().run(req);
+      await check('is_active').isBoolean().withMessage('Is active should be either true or false').run(req);
+      await check('description').isLength({min: 5, max: 500}).withMessage('Blog description should be minimum of 5 and maximum of 500 characters long').trim().escape().run(req);
+      await check('content').isLength({min: 50, max: 20000}).withMessage('Blog content should be minimum of 50 and maximum of 20,000 characters long').trim().escape().run(req);
+      const errors = validationResult(req); // validating req.body against a predefined set of rules
+      if (!errors.isEmpty()) {
+        return res.status(422).send({
+          message: 'Got error while submitting',
+          data: errors.array()
+        });
+      }
+      let tags1 = JSON.parse(req.body.tags);
+      if(tags1.length < 1 || tags1.length < 1){
+        return res.status(422).send(unExpectedError(
+          'Maximum 5 tags are allowed.',
+          'Maximum 5 tags are allowed.',
+          'tags'
+        ))
+      }
+      // thumbnail path,
+      // will be served from express server
+      let image_path = config.SERVER_URL + '/' + req.file.filename;
+      const {title, description, is_active, content} = req.body;
+      let slug = convertIntoSlug(title); // slug for blog
+      let loggedin_user = req.user.uid;
+      console.log("USER", loggedin_user)
+      let check_slug = await knex('ed_blogs').where('b_slug', slug).first();
+      if (check_slug) {
+        return res.status(422).send(unExpectedError(
+          'This blog name already exists.',
+          'This blog name already exists.',
+          'blog'
+        ))
+      }
+      let obj = {
+        b_title: title,
+        b_slug: slug,
+        b_description: description,
+        b_admin_id: loggedin_user,
+        b_thumbnail: image_path,
+        b_content: content,
+        b_is_active: is_active
+      }
 
-    let blog = await trx('ed_blogs').insert(obj).returning('*');
-
-    let blog_id = blog[0].b_id;
-
-    let tags_arr = [];
-    for (let y of tags) {
+      let blog = await trx('ed_blogs').insert(obj).returning('*');
+      let blog_id = blog[0].b_id;
+      let tags_arr = [];
+    for (let y of tags1) {
       tags_arr.push({
         b_c_blog_id: blog_id,
         b_c_category_id: y
@@ -73,21 +110,22 @@ module.exports.createBlog = async (req, res) => {
 
     let blog_cat_result = await trx('ed_blogs_categories').insert(tags_arr).returning('*');
     trx.commit();
-    return res.status(200).send({
-      message: 'Blog is saved successfully',
-      data: ''
-    })
-
-  } catch (err) {
-    trx.rollback();
-    return res.status(422).send(
-      unExpectedError(
-        'Blog could not be saved, please try again',
-        'Blog could not be saved, please try again',
-        'error'
-      )
-    )
-  }
+      if (blog) {
+        return res.status(200).send({
+          message: 'Blog details is saved successfully'
+          //data: object
+        })
+      }
+    } catch (err) {
+      trx.rollback();
+      return res.status(422).send(
+        unExpectedError(
+          'Blog could not be saved, please try again',
+          'Blog could not be saved, please try again',
+          'error'
+        ))
+    }
+  })
 }
 
 module.exports.getBlogBySlug = async (req, res) => {
@@ -120,6 +158,8 @@ module.exports.getBlogBySlug = async (req, res) => {
         blog_slug: blog.b_slug,
         description: blog.b_description,
         tags: tags_arr,
+        content: blog.b_content,
+        thumbnail: blog.b_thumbnail,
 
         is_active: blog.b_is_active,
       }
@@ -146,61 +186,107 @@ module.exports.getBlogBySlug = async (req, res) => {
 
 module.exports.editBlog = async (req, res) => {
 
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).send({
-      message: 'Got error while submitting',
-      data: errors.array()
-    });
-  }
-
-  let trx = await knex.transaction();
-  try {
-    let loggedin_user = req.user.uid;
-    let blog_id = req.params.blog_id;
-    const {title, tags, description, is_active} = req.body;
-
-    let slug = convertIntoSlug(title);
-
-    let obj = {
-      b_title: title,
-      b_slug: slug,
-      b_description: description,
-      b_admin_id: loggedin_user,
-      b_is_active: is_active
+  fileUploadNow(req, res, async function (err) {
+    if (err) {
+      return res.status(422).send(unExpectedError(
+        'Please select a thumbnail & only .png, .jpg and .jpeg format allowed!',
+        'Please select a thumbnail & only .png, .jpg and .jpeg format allowed!',
+        'image'
+      ))
     }
-
-    let blog = await trx('ed_blogs').where('b_id', blog_id).update(obj).returning('*');
-
-    let tags_arr = [];
-    for (let y of tags) {
-      tags_arr.push({
-        b_c_blog_id: blog_id,
-        b_c_category_id: y
-      })
-    }
-
-    let tags_delete = await trx('ed_blogs_categories').where('b_c_blog_id', blog_id).del().returning('*');
-    let tags_result = await trx('ed_blogs_categories').insert(tags_arr).returning('*');
-
-    trx.commit();
-    return res.status(200).send({
-      message: 'Blog is updated successfully',
-      data: {
-        slug: blog[0].b_slug
+  
+    let trx = await knex.transaction();
+    try {
+      await check('title').isLength({ min: 5, max: 200}).withMessage('Title is required & characters length should be between 5 and 200.').trim().escape().run(req);
+      await check('is_active').isBoolean().withMessage('Is active should be either true or false').run(req);
+      await check('description').isLength({min: 5, max: 500}).withMessage('Blog description should be minimum of 5 and maximum of 500 characters long').trim().escape().run(req);
+      await check('content').isLength({min: 50, max: 20000}).withMessage('Blog content should be minimum of 50 and maximum of 20,000 characters long').trim().escape().run(req);
+      const errors = validationResult(req); // validating req.body against a predefined set of rules
+      if (!errors.isEmpty()) {
+        return res.status(422).send({
+          message: 'Got error while submitting',
+          data: errors.array()
+        });
       }
-    })
+      let tags1 = JSON.parse(req.body.tags);
+      if(tags1.length < 1 || tags1.length < 1){
+        return res.status(422).send(unExpectedError(
+          'Maximum 5 tags are allowed.',
+          'Maximum 5 tags are allowed.',
+          'tags'
+        ))
+      }
+      // thumbnail path,
+      // will be served from express server
+      
+      const {title, description, is_active, content} = req.body;
+      let slug = convertIntoSlug(title); // slug for blog
+      let loggedin_user = req.user.uid;
+      console.log("USER", loggedin_user)
+      const { blog_id } = req.params
+      let check_slug = await knex('ed_blogs').where('b_slug', slug).first();
+      if (check_slug) {
+        return res.status(422).send(unExpectedError(
+          'This blog name already exists.',
+          'This blog name already exists.',
+          'blog'
+        ))
+      }
+      let obj = {};
+      if (!req.file) {
+        obj = {
+          b_title: title,
+          b_slug: slug,
+          b_description: description,
+          b_admin_id: loggedin_user,
+          b_content: content,
+          b_is_active: is_active
+        }
+      } else {
+        let image_path = config.SERVER_URL + '/' + req.file.filename;
+        obj = {
+          b_title: title,
+          b_slug: slug,
+          b_description: description,
+          b_admin_id: loggedin_user,
+          b_thumbnail: image_path,
+          b_content: content,
+          b_is_active: is_active
+        }
+      }
+      let blog = await trx('ed_blogs').where('b_id', blog_id).update(obj).returning('*');
 
-  } catch (err) {
-    trx.rollback();
-    return res.status(422).send(
-      unExpectedError(
-        'Blog could not be updated, please try again',
-        'Blog could not be updated, please try again',
-        'blog'
+      let tags_arr = [];
+      for (let y of tags1) {
+        tags_arr.push({
+          b_c_blog_id: blog_id,
+          b_c_category_id: y
+        })
+      }
+
+      let tags_delete = await trx('ed_blogs_categories').where('b_c_blog_id', blog_id).del().returning('*');
+      let tags_result = await trx('ed_blogs_categories').insert(tags_arr).returning('*');
+
+      trx.commit();
+      return res.status(200).send({
+        message: 'Blog is updated successfully',
+        data: {
+          slug: blog[0].b_slug
+        }
+      })
+
+    } catch (err) {
+      console.log("edit error", err)
+      trx.rollback();
+      return res.status(422).send(
+        unExpectedError(
+          'Blog could not be updated, please try again',
+          'Blog could not be updated, please try again',
+          'blog'
+        )
       )
-    )
-  }
+    }
+  })
 }
 
 module.exports.deleteBlog = async (req, res) => {

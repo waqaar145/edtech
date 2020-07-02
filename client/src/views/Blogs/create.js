@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
+import ReactHtmlParser from 'react-html-parser';
 import { Button, Col, Container, Form, Input, Row, FormGroup, Label, FormFeedback } from 'reactstrap';
 import {connect} from 'react-redux';
-
+import useForm from './../../utils/form/useForm';
 import InputText from './../../partials/forms/InputText';
 import InputFile from './../../partials/forms/InputFile';
 import InputCheckbox from './../../partials/forms/InputCheckbox';
@@ -12,18 +13,19 @@ import {showInputFieldError} from './../../utils/validations/common';
 import { validateFinallySimple } from './../../utils/validations/inputValidations';
 import ServerErrors from './../../components/messages/serverError';
 import ServerSuccess from './../../components/messages/serverSuccess';
-
+import { convertFileToBase64 } from './../../utils/validations/common';
 import './../../assets/css/error.css'
 import PropTypes from 'prop-types'
 import CreateFormHOC from './../../HOCs/createForm'
 import { withRouter } from "react-router-dom";
-import {getBlogCategoriesAction, clearBlogAction, InputStringAction, InputErrorAction, createBlogAction, getBlogBySlugAction, editBlogAction} from './../../stores/actions/blogActions';
+import {getBlogCategoriesAction, clearBlogAction, InputStringAction, InputFileAction, InputErrorAction, createBlogAction, getBlogBySlugAction, editBlogAction} from './../../stores/actions/blogActions';
 
 const CreateBlog = (props) => {
 
   const { 
     form,
     InputStringAction,
+    InputFileAction,
     InputErrorAction,
     errors,
     blog,
@@ -51,7 +53,7 @@ const CreateBlog = (props) => {
     }
 
     return () => {
-      // clearBlogAction();
+       clearBlogAction();
     }
   }, []);
 
@@ -71,6 +73,7 @@ const CreateBlog = (props) => {
   const handleChange = async (e) => {
     const {name, value} = e.target;
     const data = {name, value};
+    console.log(name, value)
     const object = {
       target: data,
       initialState: form[name]
@@ -78,7 +81,25 @@ const CreateBlog = (props) => {
     await InputStringAction(object);
     await InputErrorAction(object)
   }
+    
+  const handleFileChange = async (e) => {
+    const { name } = e.target;
+    let file = e.target.files[0];
+    let { base64 } = await convertFileToBase64(file);
 
+    let data = {
+      name,
+      value: file
+    }
+    const object = {
+      target: data,
+      initialState: {...form[name], imgUrl: base64}
+    }
+
+    await InputFileAction(object);
+    await InputErrorAction(object)
+  }
+ 
   const handleReactSelectChange = async (name, e) => {
     const data = {name, value: e};
 
@@ -140,25 +161,54 @@ const CreateBlog = (props) => {
           error={showInputFieldError(errors, 'title')}
           />
 
+        <InputText
+          id="description"
+          type="text"
+          name="description"
+          label="Description"
+          placeholder="Blog description"
+          value={form.description.input_val}
+          handleChange={handleChange}
+          error={showInputFieldError(errors, 'description')}
+          />  
+
+        <InputFile // don't use id here as used in semester name
+          type="file"
+          name="thumbnail"
+          label="Thumbnail"
+          handleChange={handleFileChange}
+          error={showInputFieldError(errors, 'thumbnail')}
+          selectedimage={form.thumbnail.imgUrl}
+          />  
+
         <ReactSelect
-          label="tags"
+          label="Tags"
           value={form.tags.input_val}
           handleChange={(e) => handleReactSelectChange('tags', e)}
           options={categories}
           error={showInputFieldError(errors, 'tags')}
           isMulti={true}
         />
-
+        <InputCheckbox
+          id="is_active"
+          type="checkbox"
+          name="is_active"
+          label="Is active"
+          value={form.is_active.input_val}
+          handleChange={handleCheckboxChange}
+          error={showInputFieldError(errors, 'is_active')}
+          />
         <InputCKEditor
-          id="description"
-          label="Description"
-          value={form.description.input_val}
+          id="content"
+          label="Content"
+          value={form.content.input_val}
           handleChange={(editor) => {
-            handleCKEditorChange('description', editor)
+            handleCKEditorChange('content', editor)
           }}
-          error={showInputFieldError(errors, 'description')}
+          error={showInputFieldError(errors, 'content')}
           ckeditorHeightClass="ckeditor-custom-height"
           />
+
           <hr />
           <Button color="primary" type="submit">Save</Button>
       </Form>
@@ -176,6 +226,7 @@ const mapDispatchToProps = {
   getBlogCategoriesAction,
   clearBlogAction,
   InputStringAction,
+  InputFileAction,
   InputErrorAction,
 
   createBlogAction,
@@ -186,7 +237,6 @@ const mapDispatchToProps = {
 function mapStateToProps (state) {
   return {
     categories: state.Blog.categories_label_value,
-
     form: state.Blog.form,
     errors: state.Blog.form.client_errors,
     blog: state.Blog.blog

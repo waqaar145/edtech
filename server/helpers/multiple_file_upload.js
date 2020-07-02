@@ -11,9 +11,10 @@ var fileUpload = multer({
       }
   }),
   fileFilter: (req, file, cb) => {
-    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
+    if (file.mimetype === "image/png" || file.mimetype === "image/jpg" || file.mimetype === "image/jpeg") {
       cb(null, true);
     } else {
+      console.log('FALSE0')
       cb(new Error('Only images are allowed - jpg, jpeg, png & file size should be maximum of 2MB.'), false);
     }
   }

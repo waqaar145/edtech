@@ -81,6 +81,7 @@ const CreateContent = (props) => {
   const handleChange = async (e) => {
     const {name, value} = e.target;
     const data = {name, value};
+    console.log(name, value)
     const object = {
       target: data,
       initialState: form[name]
@@ -225,6 +226,18 @@ const CreateContent = (props) => {
               options={chapters_label_value}
               error={showInputFieldError(errors, 'chapter')}
             />
+
+            
+            <InputText
+              id="content_number"
+              type="text"
+              name="content_number"
+              label="Content number"
+              placeholder="Content number"
+              value={form.content_number.input_val}
+              handleChange={handleChange}
+              error={showInputFieldError(errors, 'content_number')}
+              />
 
             <FormGroup row>
               <Label for="semester" sm={2}>Types & Level</Label>

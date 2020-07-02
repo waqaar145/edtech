@@ -103,6 +103,7 @@ module.exports.createSemester = async (req, res, next) => {
         })
       }
     } catch (err) {
+      console.log(err)
       return res.status(422).send(unExpectedError(
         'Something went wrong, please try to add details again',
         'Something went wrong, please try to add details again',

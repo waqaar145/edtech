@@ -145,7 +145,8 @@ export const emailValidation = (key, value, required) => {
 }
 
 export const imageValidation = (key, value, required, size, dimensions, image_type) => {
-  if (required || value) {
+  console.log("all check", key, value, required, size, dimensions, image_type)
+  if (required || Object.keys(value).length > 0) {
     if (!value) {
       return {
         key: key,
@@ -212,7 +213,6 @@ export const objectValidation = (key, value, required, pattern) => {
   }
 }
 
-
 export const validateFinally = async (form) => {
   let errors = []
   for (const [key, value] of Object.entries(form)) {
@@ -248,6 +248,7 @@ export const validateFinally = async (form) => {
 export const validateFinallySimple = async (values) => {
   let errors = []
   for (const [key1, value1] of Object.entries(values)) {
+    console.log(key1, value1)
     if (key1 === 'client_errors' || key1 === 'id') break;
     let error = {};
     if (value1.type.name === 'String') {

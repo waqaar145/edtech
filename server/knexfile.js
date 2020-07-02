@@ -4,7 +4,7 @@ module.exports = {
     host: 'localhost',
     user: 'postgres',
     password: 'root',
-    database: 'school'
+    database: 'edtech'
   },
   migrations: {
     directory: __dirname + '/db/migrations',

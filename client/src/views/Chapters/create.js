@@ -168,7 +168,6 @@ const CreateChapter = (props) => {
     }
   }, [chapter]);
 
-  console.log(values)
 
   function submit () {
     let data = {

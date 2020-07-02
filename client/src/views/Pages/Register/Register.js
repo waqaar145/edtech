@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import { validateFinally, stringValidation, emailValidation } from './../../../helpers/validation';
 import {signupAction} from './../../../stores/actions/authActions';
 import './../../../assets/css/error.css'
-import { useHistory } from "react-router-dom";
+//import { useHistory } from "react-router-dom";
 import PropTypes from 'prop-types'
 import ServerErrors from './../../../components/messages/serverError'
 
@@ -14,7 +14,7 @@ const Register = (props) => {
       email: '',
       password: ''
     }
-    const history = useHistory();
+    //const history = useHistory();
     const [values, setValue] = useState(userState)
     const [errors, setErrors] = useState(userState)
     const [serverErrors, setServerError] = useState([])

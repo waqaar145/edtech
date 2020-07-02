@@ -1,6 +1,7 @@
-import { GET_BLOG_CATEGORIES, GET_BLOG_CATEGORY_BY_SLUG, DELETE_BLOG_CATEGORY_BY_ID, CLEAR_BLOG_ACTION, INPUT_BLOG_STRING_ACTION, SET_BLOG_CLIENT_ERRORS, SET_BLOG_CLIENT_SUBMIT_ERRORS, GET_BLOGS, GET_BLOG_BY_SLUG, DELETE_BLOG_BY_ID } from './../../types'
+import { GET_BLOG_CATEGORIES, GET_BLOG_CATEGORY_BY_SLUG, DELETE_BLOG_CATEGORY_BY_ID, CLEAR_BLOG_ACTION, INPUT_BLOG_STRING_ACTION, INPUT_BLOG_THUMBNAIL, SET_BLOG_CLIENT_ERRORS, SET_BLOG_CLIENT_SUBMIT_ERRORS, GET_BLOGS, GET_BLOG_BY_SLUG, DELETE_BLOG_BY_ID } from './../../types'
 import api from './../apis/blog';
-import {stringHtmlValidation, stringValidation, numberValidation, arrayValidation, booleanValidation, objectValidation, validateFinallySimple} from './../../utils/validations/inputValidations'
+import {stringHtmlValidation, stringValidation, numberValidation, arrayValidation, booleanValidation, objectValidation, validateFinallySimple, imageValidation} from './../../utils/validations/inputValidations'
+import { func } from 'prop-types';
 
 export function getBlogCategories (data) {
   return {
@@ -32,6 +33,13 @@ export function clearBlogAction () {
 export function InputStringAction (object) {
   return {
     type: INPUT_BLOG_STRING_ACTION,
+    data: object
+  }
+}
+
+export function InputFileAction (object) {
+  return {
+    type: INPUT_BLOG_THUMBNAIL,
     data: object
   }
 }
@@ -100,6 +108,8 @@ export const InputErrorAction = object => async dispatch => {
     error = await arrayValidation(name, value, required, min, max);
   } else if (type.name === 'Boolean') {
     error = await booleanValidation(name, value, required);
+  } else if (type.name === 'File') {
+    error = await imageValidation(name, value, required, size, dimensions, image_type);
   } 
   dispatch(InputError({name, error}))
 }
@@ -164,6 +174,7 @@ export const getBlogsAction = () => async dispatch => {
 
 
 export const createBlogAction = (data) => async dispatch => {
+  console.log('NORMAL DATA - ', data);
   try {
     await validateFinallySimple(data);
     let tags = [];
@@ -171,17 +182,17 @@ export const createBlogAction = (data) => async dispatch => {
     for (let y of data.tags.input_val) {
       tags.push(y.value)
     }
-    let final_object = {
-      title: data.title.input_val,
-      tags: tags,
-      description: data.description.input_val,
-      is_active: data.is_active.input_val,
-    }
+    var formData = new FormData();
+    formData.append('title', data.title.input_val);
+    formData.append('tags', JSON.stringify(tags));
+    formData.append('description', data.description.input_val);
+    formData.append('thumbnail', data.thumbnail.input_val);
+    formData.append('is_active', data.is_active.input_val);
+    formData.append('content', data.content.input_val);
 
-    let result = await api.blog.create(final_object);
+    let result = await api.blog.create(formData);
     return result
-  } catch (error) {
-    console.log(error);
+  } catch (error) {;
     if (error.hasOwnProperty('error_type')) {
       dispatch(setClientError(error))
     } else {
@@ -196,22 +207,29 @@ export const createBlogAction = (data) => async dispatch => {
 
 export const editBlogAction = (data, id) => async dispatch => {
   try {
+    console.log(data)
     await validateFinallySimple(data);
+    console.log("TYPECHECk", typeof data.thumbnail.input_val)
     let tags = [];
 
     for (let y of data.tags.input_val) {
       tags.push(y.value)
     }
-    let final_object = {
-      title: data.title.input_val,
-      tags: tags,
-      description: data.description.input_val,
-      is_active: data.is_active.input_val,
+    
+    var formData = new FormData();
+    formData.append('title', data.title.input_val);
+    formData.append('tags', JSON.stringify(tags));
+    formData.append('description', data.description.input_val);
+    if (typeof data.thumbnail.input_val === 'object') {
+      formData.append('thumbnail', data.thumbnail.input_val);
     }
-
-    let result = await api.blog.edit(final_object, id);
+    formData.append('is_active', data.is_active.input_val);
+    formData.append('content', data.content.input_val);
+    console.log('EDITING FORM DATA - ', formData.getAll('title'))
+    let result = await api.blog.edit(formData, id);
     return result;
   } catch (error) {
+    console.log(error)
     if (error.hasOwnProperty('error_type')) {
       dispatch(setClientError(error))
     } else {
