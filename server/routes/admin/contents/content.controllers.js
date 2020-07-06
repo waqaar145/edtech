@@ -86,8 +86,14 @@ module.exports.createContent = async (req, res) => {
   let trx = await knex.transaction();
   try {
     let loggedin_user = req.user.uid;
-    const {semester_id, subject_id, chapter_id, content_type, difficulty_level, years_asked, content_name, content_slug, content_description, is_active} = req.body;
-
+    const {semester_id, subject_id, chapter_id, content_number, content_type, difficulty_level, years_asked, content_name, content_slug, content_description, is_active} = req.body;
+    if (content_number > 100) {
+      return res.status(422).send(unExpectedError(
+        'Content Number limited to 100.',
+        'Content Number limited to 100.',
+        'Content Number'
+      ))
+    }
     let semester = await knex('ed_semesters').where('sm_id', semester_id).first();
     if (!semester) {
       return res.status(422).send(
@@ -128,6 +134,7 @@ module.exports.createContent = async (req, res) => {
       cn_semester_id: semester_id,
       cn_subject_id: subject_id,
       cn_chapter_id: chapter_id,
+      cn_content_number: content_number,
       cn_type: content_type,
       cn_difficulty_level: difficulty_level,
       cn_name: content_name,
@@ -215,6 +222,7 @@ module.exports.getContentBySlug = async (req, res) => {
         content_name: content.cn_name,
         content_slug: content.cn_slug,
         content_description: content.cn_description,
+        content_number: content.cn_content_number,
         content_type: content_type_value_label,
         difficulty_level: difficulty_level_label_value,
         years_asked: year_month_arr,
@@ -271,8 +279,14 @@ module.exports.editContent = async (req, res) => {
   try {
     let loggedin_user = req.user.uid;
     let content_id = req.params.content_id;
-    const {semester_id, subject_id, chapter_id, content_type, difficulty_level, years_asked, content_name, content_slug, content_description, is_active} = req.body;
-
+    const {semester_id, subject_id, chapter_id, content_type, difficulty_level, years_asked, content_name, content_number, content_slug, content_description, is_active} = req.body;    
+    if (content_number > 100) {
+      return res.status(422).send(unExpectedError(
+        'Content Number limited to 100.',
+        'Content Number limited to 100.',
+        'Content Number'
+      ))
+    }
     let semester = await knex('ed_semesters').where('sm_id', semester_id).first();
     if (!semester) {
       return res.status(422).send(
@@ -313,6 +327,7 @@ module.exports.editContent = async (req, res) => {
       cn_semester_id: semester_id,
       cn_subject_id: subject_id,
       cn_chapter_id: chapter_id,
+      cn_content_number: content_number,
       cn_type: content_type,
       cn_difficulty_level: difficulty_level,
       cn_name: content_name,

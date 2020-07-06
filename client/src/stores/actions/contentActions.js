@@ -132,7 +132,6 @@ export const InputErrorAction = object => async dispatch => {
 
 export const createContentAction = (data) => async dispatch => {
   try {
-    console.log(data)
     await validateFinallySimple(data);
     let years_asked_data = [];
 
@@ -146,12 +145,12 @@ export const createContentAction = (data) => async dispatch => {
       semester_id: data.semester.input_val.value,
       subject_id: data.subject.input_val.value,
       chapter_id: data.chapter.input_val.value,
+      content_number: data.content_number.input_val,
       content_type: data.content_type.input_val.value,
       difficulty_level: data.difficulty_level.input_val.value,
       years_asked: years_asked_data,
       is_active: data.is_active.input_val,
     }
-
     let result = await api.content.create(final_object);
     return result
   } catch (error) {
@@ -182,6 +181,7 @@ export const editContentAction = (data, id) => async dispatch => {
       semester_id: data.semester.input_val.value,
       subject_id: data.subject.input_val.value,
       chapter_id: data.chapter.input_val.value,
+      content_number: data.content_number.input_val,
       content_type: data.content_type.input_val.value,
       difficulty_level: data.difficulty_level.input_val.value,
       years_asked: years_asked_data,

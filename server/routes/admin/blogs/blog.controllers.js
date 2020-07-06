@@ -79,7 +79,6 @@ module.exports.createBlog = async (req, res) => {
       const {title, description, is_active, content} = req.body;
       let slug = convertIntoSlug(title); // slug for blog
       let loggedin_user = req.user.uid;
-      console.log("USER", loggedin_user)
       let check_slug = await knex('ed_blogs').where('b_slug', slug).first();
       if (check_slug) {
         return res.status(422).send(unExpectedError(
@@ -209,7 +208,7 @@ module.exports.editBlog = async (req, res) => {
         });
       }
       let tags1 = JSON.parse(req.body.tags);
-      if(tags1.length < 1 || tags1.length < 1){
+      if(tags1.length < 1){
         return res.status(422).send(unExpectedError(
           'Maximum 5 tags are allowed.',
           'Maximum 5 tags are allowed.',
@@ -222,10 +221,9 @@ module.exports.editBlog = async (req, res) => {
       const {title, description, is_active, content} = req.body;
       let slug = convertIntoSlug(title); // slug for blog
       let loggedin_user = req.user.uid;
-      console.log("USER", loggedin_user)
       const { blog_id } = req.params
       let check_slug = await knex('ed_blogs').where('b_slug', slug).first();
-      if (check_slug) {
+      if (check_slug.b_id !== blog_id) {
         return res.status(422).send(unExpectedError(
           'This blog name already exists.',
           'This blog name already exists.',
@@ -276,7 +274,6 @@ module.exports.editBlog = async (req, res) => {
       })
 
     } catch (err) {
-      console.log("edit error", err)
       trx.rollback();
       return res.status(422).send(
         unExpectedError(

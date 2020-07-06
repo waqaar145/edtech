@@ -81,7 +81,6 @@ const CreateContent = (props) => {
   const handleChange = async (e) => {
     const {name, value} = e.target;
     const data = {name, value};
-    console.log(name, value)
     const object = {
       target: data,
       initialState: form[name]

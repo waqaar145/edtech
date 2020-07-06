@@ -6,6 +6,7 @@ exports.up = function(knex, Promise) {
     table.integer('cn_chapter_id').references('cp_id').inTable('ed_chapters');
     table.string('cn_name', 5000).notNullable();
     table.string('cn_description', 20000);
+    table.integer('cn_content_number', 100).notNullable();
     table.string('cn_slug', 1000).unique().notNullable();
     table.integer('cn_type', [1, 2]).notNullable().defaultTo(1); // (theory -> 1) & (sum -> 2)
     table.integer('cn_difficulty_level', [1, 2, 3]).notNullable().defaultTo(1); // (easy -> 1) & (medium -> 2) & (hard -> 3)

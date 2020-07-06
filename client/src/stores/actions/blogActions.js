@@ -174,7 +174,6 @@ export const getBlogsAction = () => async dispatch => {
 
 
 export const createBlogAction = (data) => async dispatch => {
-  console.log('NORMAL DATA - ', data);
   try {
     await validateFinallySimple(data);
     let tags = [];
@@ -207,9 +206,7 @@ export const createBlogAction = (data) => async dispatch => {
 
 export const editBlogAction = (data, id) => async dispatch => {
   try {
-    console.log(data)
     await validateFinallySimple(data);
-    console.log("TYPECHECk", typeof data.thumbnail.input_val)
     let tags = [];
 
     for (let y of data.tags.input_val) {
@@ -225,11 +222,9 @@ export const editBlogAction = (data, id) => async dispatch => {
     }
     formData.append('is_active', data.is_active.input_val);
     formData.append('content', data.content.input_val);
-    console.log('EDITING FORM DATA - ', formData.getAll('title'))
     let result = await api.blog.edit(formData, id);
     return result;
   } catch (error) {
-    console.log(error)
     if (error.hasOwnProperty('error_type')) {
       dispatch(setClientError(error))
     } else {

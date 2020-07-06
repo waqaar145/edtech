@@ -171,8 +171,6 @@ let initialState = {
 }
 export default function Content (state = initialState, action = {}){
   switch (action.type) {
-
-
     case INPUT_STRING_ACTION:
 
       const { target} = action.data;
@@ -286,6 +284,10 @@ export default function Content (state = initialState, action = {}){
           content_type: {
             ...state.form.content_type,
             input_val: action.data.content_type
+          },
+          content_number: {
+            ...state.form.content_number,
+            input_val: action.data.content_number
           },
           difficulty_level: {
             ...state.form.difficulty_level,
