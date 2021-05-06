@@ -10,6 +10,7 @@ exports.up = function(knex, Promise) {
     table.integer('cn_type', [1, 2]).notNullable().defaultTo(1); // (theory -> 1) & (sum -> 2)
     table.integer('cn_difficulty_level', [1, 2, 3]).notNullable().defaultTo(1); // (easy -> 1) & (medium -> 2) & (hard -> 3)
     table.integer('cn_admin_id').references('a_id').inTable('ed_admins');
+    table.integer('cn_total_comments').defaultTo(0);
     table.boolean('cn_is_active').defaultTo(true);
     table.boolean('cn_is_deleted').defaultTo(false);
     table.timestamp('cn_created_at').defaultTo(knex.fn.now());
